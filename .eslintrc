@@ -1,0 +1,11 @@
+{
+  "root": true,
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "extends": "@antfu",
+  "rules": {
+    "n/prefer-global/process": ["error", "always"]
+  }
+}
