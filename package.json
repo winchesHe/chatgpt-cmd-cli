@@ -46,11 +46,15 @@
     "registry": "https://registry.npmjs.org/"
   },
   "dependencies": {
+    "@inquirer/select": "^1.2.12",
     "@winches/utils": "^0.0.8",
     "chalk": "^5.2.0",
+    "chatgpt": "^5.2.5",
     "commander": "^10.0.0",
     "consola": "^3.2.3",
-    "inquirer": "^9.1.4"
+    "execa": "^8.0.1",
+    "inquirer": "^9.1.4",
+    "ora": "^7.0.1"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^0.40.0",

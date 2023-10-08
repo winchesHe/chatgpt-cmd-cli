@@ -1,3 +1,3 @@
-# ts-start
+## 使用示例
 
-[![NPM version](https://img.shields.io/npm/v/pkg-name?color=a1b858&label=)](https://www.npmjs.com/package/pkg-name)
+![在这里插入图片描述](https://img-blog.csdnimg.cn/6f569116affe4c4b8131ab4dd7e1d4e2.gif)
