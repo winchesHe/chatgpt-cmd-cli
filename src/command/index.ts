@@ -59,7 +59,7 @@ export async function start(question?: string) {
             resultData.execute = false
           }
           else if (choice === 'change') {
-            const changeCmd = await getQuestion(`调整该指令：${resultData.cmd}`, resultData.cmd)
+            const changeCmd = await getQuestion(`调整该指令（${resultData.cmd}）`, resultData.cmd)
             resultData.cmd = changeCmd
           }
         }
