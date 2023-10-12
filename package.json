@@ -8,7 +8,7 @@
   "keywords": [],
   "sideEffects": false,
   "bin": {
-    "pkg-bin": "dist/bin.js"
+    "pkg-bin": "dist/cli.js"
   },
   "scripts": {
     "prepare": "simple-git-hooks",

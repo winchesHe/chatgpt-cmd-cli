@@ -6,9 +6,11 @@ import { fetchQuestion } from '../utils'
 import { normalizeDesc, normalizeOutput } from '../utils/log'
 import { convertCmd } from '../utils/transform'
 import { exec } from '../utils/execa'
+import { readEnv, writeEnv } from '../utils/env'
 
 const defaultBanner = '欢迎使用 cli-gpt 智能终端应用'
 const gradientBanner = printColorLogs(defaultBanner)
+const accessToken = readEnv().accessToken
 
 export async function start(question?: string) {
   console.log()
@@ -22,6 +24,10 @@ export async function start(question?: string) {
 
   if (!question)
     question = await getQuestion()
+  if (!accessToken) {
+    const token = await getQuestion('请输入你的accessToken（https://chat.openai.com/api/auth/session）：')
+    writeEnv({ accessToken: token })
+  }
 
   // 请求GPT
   const result = await fetchQuestion(question)

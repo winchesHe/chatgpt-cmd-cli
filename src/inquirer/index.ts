@@ -5,11 +5,11 @@ import select from '@inquirer/select'
 type SelectData = Parameters<typeof select>['0']
 type ReloadValue = 'execute' | 'reRun'
 
-export async function getQuestion(): Promise<string> {
+export async function getQuestion(msg = '请填写你的问题: '): Promise<string> {
   const question: QuestionCollection = {
     type: 'input',
     name: 'question',
-    message: '请填写你的问题: ',
+    message: msg,
   }
   return (await inquirer.prompt([question])).question
 }
