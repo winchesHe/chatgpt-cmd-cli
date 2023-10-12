@@ -8,6 +8,8 @@ import { readEnv, writeEnv } from './env'
 let parentMessageId: string | undefined = readEnv().parentMessageId
 let conversationId: string | undefined = readEnv().conversationId
 
+let runningParentMessageId: string | undefined
+
 export function createPromptFactory(instance: ChatGPTUnofficialProxyAPI, prompt: string) {
   return async (message: string) => {
     let res: ChatMessage | undefined
@@ -23,11 +25,17 @@ export function createPromptFactory(instance: ChatGPTUnofficialProxyAPI, prompt:
     }
 
     res = await instance.sendMessage(message, {
-      parentMessageId,
       conversationId,
+      ...(runningParentMessageId
+        ? {
+            parentMessageId: runningParentMessageId,
+          }
+        : {
+            parentMessageId,
+          }),
     })
 
-    parentMessageId = res.id
+    runningParentMessageId = res.id
 
     return res
   }

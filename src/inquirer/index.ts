@@ -3,13 +3,19 @@ import inquirer from 'inquirer'
 import select from '@inquirer/select'
 
 type SelectData = Parameters<typeof select>['0']
-type ReloadValue = 'execute' | 'reRun'
+type ReloadValue = 'execute' | 'reRun' | 'choiceExecute'
+type ExecuteValue = 'yes' | 'no' | 'change'
 
-export async function getQuestion(msg = '请填写你的问题: '): Promise<string> {
+export async function getQuestion(msg = '请填写你的问题: ', _default?: string): Promise<string> {
   const question: QuestionCollection = {
     type: 'input',
     name: 'question',
     message: msg,
+    ...(_default
+      ? {
+          default: _default,
+        }
+      : {}),
   }
   return (await inquirer.prompt([question])).question
 }
@@ -39,10 +45,34 @@ export async function getReloadSelect() {
         value: 'execute',
       },
       {
+        name: '选择性执行命令',
+        value: 'choiceExecute',
+      },
+      {
         name: '重新输入并生成新指令',
         value: 'reRun',
       },
     ],
     '选择命令并执行',
   ) as Promise<ReloadValue>
+}
+
+export async function getIsExecuteSelect(msg: string) {
+  return getSelect(
+    [
+      {
+        name: '执行',
+        value: 'yes',
+      },
+      {
+        name: '不执行',
+        value: 'no',
+      },
+      {
+        name: '调整该指令',
+        value: 'change',
+      },
+    ],
+    msg,
+  ) as Promise<ExecuteValue>
 }
