@@ -53,13 +53,14 @@ export async function start(question?: string) {
         await generateAnswer(question)
       }
       else if (choice === 'choiceExecute') {
-        for (const resultData of result) {
-          const choice = await getIsExecuteSelect(resultData.cmd)
+        for (const index in result) {
+          const resultData = result[index]
+          const choice = await getIsExecuteSelect(`${+index + 1}. ${resultData.cmd}`)
           if (choice === 'no') {
             resultData.execute = false
           }
           else if (choice === 'change') {
-            const changeCmd = await getQuestion(`调整该指令（${resultData.cmd}）`, resultData.cmd)
+            const changeCmd = await getQuestion(`${+index + 1}. 调整该指令（${resultData.cmd}）`, resultData.cmd)
             resultData.cmd = changeCmd
           }
         }
