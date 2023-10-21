@@ -6,6 +6,8 @@ import c from 'chalk'
 export const $$ = _$({ stdio: 'inherit' })
 export const $ = _$
 
+export const execFn = _exec
+
 export async function exec(cmd: string) {
   return new Promise((resolve) => {
     _exec(cmd, (error: any, stdout: string, stderr: string) => {

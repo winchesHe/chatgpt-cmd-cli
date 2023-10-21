@@ -93,7 +93,7 @@ export async function fetchQuestion2() {
   ]
 }
 
-export async function fetchQuestion(question: string) {
+export async function fetchQuestion(question: string, errorInfo: string[] = []) {
   const api = new ChatGPTUnofficialProxyAPI({
     accessToken: readEnv().accessToken,
     apiReverseProxyUrl: 'https://ai.fakeopen.com/api/conversation',
@@ -101,8 +101,17 @@ export async function fetchQuestion(question: string) {
 
   const _cmdRunner = cmdRunner(api)
 
-  const res = await oraPromise(_cmdRunner.cmdRunner(question), {
-    text: question,
+  const isError = !!errorInfo.length
+  const [cmd, info] = errorInfo
+  const errorPrompt = `我想你帮我看下为什么当我运行\`${cmd}\`指令的时候报错了。
+
+  错误信息：
+  \`\`\`
+  ${info}
+  \`\`\``
+
+  const res = await oraPromise(_cmdRunner.cmdRunner(isError ? errorPrompt : question), {
+    text: isError ? `正在分析错误（${cmd}）...` : question,
   })
 
   try {

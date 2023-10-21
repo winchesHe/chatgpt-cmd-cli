@@ -2,7 +2,7 @@ import { resolve } from 'node:path'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
-type EnvKey = 'parentMessageId' | 'conversationId' | 'accessToken'
+type EnvKey = 'parentMessageId' | 'conversationId' | 'accessToken' | 'powerShellHistory'
 
 const __dirname = resolve(fileURLToPath(import.meta.url), '../..')
 const outputDir = resolve(__dirname, '..')

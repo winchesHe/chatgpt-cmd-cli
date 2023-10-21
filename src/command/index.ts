@@ -1,19 +1,24 @@
 /* eslint-disable no-console */
-import { printColorLogs } from '@winches/utils'
+import { printColorLogs, printErrorLogs, scanDirFile } from '@winches/utils'
 import { consola } from 'consola'
 import { getIsExecuteSelect, getQuestion, getReloadSelect } from '../inquirer'
 import { fetchQuestion } from '../utils'
 import { normalizeDesc, normalizeOutput } from '../utils/log'
 import { convertCmd } from '../utils/transform'
-import { exec } from '../utils/execa'
+import { exec, execFn } from '../utils/execa'
 import { readEnv, writeEnv } from '../utils/env'
 import type { AnswerArr } from '../types'
+import { platform } from 'os'
+import { excludeList } from '../const'
+import { readFileSync } from 'fs'
 
 const defaultBanner = '欢迎使用 cli-gpt 智能终端应用'
 const gradientBanner = printColorLogs(defaultBanner)
 const accessToken = readEnv().accessToken
+const isWin = platform() === 'win32'
+let powerShellHistory = readEnv().powerShellHistory
 
-export async function start(question?: string) {
+export async function start(question?: ({} & string) | 'fix') {
   console.log()
   // 如果标准输出处于交互式终端模式，并且终端支持至少 24 位
   console.log(
@@ -30,11 +35,48 @@ export async function start(question?: string) {
     writeEnv({ accessToken: token })
   }
 
+  // 执行修复功能
+  if (question === 'fix') {
+    // 验证是否有PowerShell记录
+    if (isWin && !powerShellHistory) {
+      powerShellHistory = scanDirFile('C:/Users', ['.txt'], excludeList).filter(item => item.includes('ConsoleHost_history'))?.[0]
+
+      if (!powerShellHistory) {
+        printErrorLogs('无法找到终端历史记录文件')
+        process.exit(1)
+      }
+
+      // 写入env
+      writeEnv({
+        powerShellHistory
+      })
+    }
+
+    const historyList = readFileSync(powerShellHistory, 'utf8').split('\n').filter(i => i)
+    const lastHistory = historyList[historyList.length - 2]
+    const transformHistory = lastHistory.replace(/\r/g, '')
+    let errorInfo = ''
+
+    await runCmd(transformHistory)
+
+    await fetchAnswer(question, [transformHistory, errorInfo])
+    process.exit(1)
+
+    async function runCmd(cmd: string) {
+      return new Promise(resolve => {
+        execFn(cmd, (err: any) => {
+          errorInfo = err?.message
+          resolve(true)
+        })
+      })
+    }
+  }
+
   // 请求GPT
   await generateAnswer(question)
 
-  async function generateAnswer(question: string) {
-    const result = await fetchQuestion(question!)
+  async function generateAnswer(question: string, errorInfo?: string[]) {
+    const result = await fetchQuestion(question!, errorInfo)
 
     if (result.length) {
       // 输出结果
