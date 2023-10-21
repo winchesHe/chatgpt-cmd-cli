@@ -65,7 +65,7 @@ export async function start(question?: ({} & string) | 'fix') {
 
     async function runCmd(cmd: string) {
       return new Promise(resolve => {
-        execFn(cmd, (err: any, stdout: string, stderr: string) => {
+        execFn(cmd, (err: any, stdout: string) => {
           errorInfo = `Error: ${err?.message}\n${stdout || ''}`
           resolve(true)
         })

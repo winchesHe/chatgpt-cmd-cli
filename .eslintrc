@@ -7,6 +7,7 @@
   "extends": "@antfu",
   "rules": {
     "n/prefer-global/process": ["error", "always"],
-    "curly": "off"
+    "curly": "off",
+    "@typescript-eslint/ban-types": "off"
   }
 }
