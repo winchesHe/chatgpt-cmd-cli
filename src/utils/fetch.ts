@@ -103,7 +103,7 @@ export async function fetchQuestion(question: string, errorInfo: string[] = []) 
 
   const isError = !!errorInfo.length
   const [cmd, info] = errorInfo
-  const errorPrompt = `我想你帮我看下为什么当我运行\`${cmd}\`指令的时候报错了。
+  const errorPrompt = `运行\`${cmd}\`指令的时候报错了，我要怎么修复它，下面三个反引号圈起来的是错误信息，你可以根据错误信息思考出对应的解决办法。
 
   错误信息：
   \`\`\`

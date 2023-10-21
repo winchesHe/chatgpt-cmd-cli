@@ -11,6 +11,7 @@ import type { AnswerArr } from '../types'
 import { platform } from 'os'
 import { excludeList } from '../const'
 import { readFileSync } from 'fs'
+import { oraPromise } from 'ora'
 
 const defaultBanner = '欢迎使用 cli-gpt 智能终端应用'
 const gradientBanner = printColorLogs(defaultBanner)
@@ -64,8 +65,8 @@ export async function start(question?: ({} & string) | 'fix') {
 
     async function runCmd(cmd: string) {
       return new Promise(resolve => {
-        execFn(cmd, (err: any) => {
-          errorInfo = err?.message
+        execFn(cmd, (err: any, stdout: string, stderr: string) => {
+          errorInfo = `Error: ${err?.message}\n${stdout || ''}`
           resolve(true)
         })
       })
@@ -120,7 +121,10 @@ export async function start(question?: ({} & string) | 'fix') {
 
     try {
       for (const cmd of cmdList) {
-        await exec(cmd)
+        await oraPromise(exec(cmd), {
+          text: `正在运行 ${cmd}...`,
+          successText: `✨ ${cmd} 运行成功！`
+        })
       }
     }
     catch (error) {
