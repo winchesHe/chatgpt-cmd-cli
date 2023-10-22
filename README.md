@@ -4,4 +4,6 @@
 
 ## 自动识别并修复指令
 
-目前支持 `Win`
+目前支持 `Win、Mac`
+
+![](./image/gpt-cli-fix.gif)

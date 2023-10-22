@@ -28,6 +28,9 @@ dependencies:
   ora:
     specifier: ^7.0.1
     version: 7.0.1
+  shell-history:
+    specifier: ^2.0.0
+    version: 2.0.0
 
 devDependencies:
   '@antfu/eslint-config':
@@ -2947,6 +2950,11 @@ packages:
   /shebang-regex@3.0.0:
     resolution: {integrity: sha512-7++dFhtcx3353uBaq8DDR4NuxBetBzC7ZQOhmTQInHEd6bSrXdiEyzCvG07Z44UYdLShWUyXt5M/yhz8ekcb1A==}
     engines: {node: '>=8'}
+
+  /shell-history@2.0.0:
+    resolution: {integrity: sha512-gk7ORkNTLZHmxD6K6vcyijxmYwlI2vVr8clvgKFqazHQKMI9wBXrze4u4af0PQ1uY86XB6JT8WKcmiVGW93KUQ==}
+    engines: {node: '>=12'}
+    dev: false
 
   /signal-exit@3.0.7:
     resolution: {integrity: sha512-wnD2ZE+l+SPC/uoS0vXeE9L1+0wuaMqKlfz9AMUo38JsyLSBWSFcHR1Rri62LZc12vLr1gb3jl7iwQhgwpAbGQ==}

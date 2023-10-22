@@ -1,6 +1,13 @@
 /* eslint-disable no-console */
+import { platform } from 'node:os'
+import { readFileSync } from 'node:fs'
 import { printColorLogs, printErrorLogs, scanDirFile } from '@winches/utils'
 import { consola } from 'consola'
+import { oraPromise } from 'ora'
+
+// @ts-expect-error 包不存在类型声明
+import { shellHistory } from 'shell-history'
+
 import { getIsExecuteSelect, getQuestion, getReloadSelect } from '../inquirer'
 import { fetchQuestion } from '../utils'
 import { normalizeDesc, normalizeOutput } from '../utils/log'
@@ -8,10 +15,7 @@ import { convertCmd } from '../utils/transform'
 import { exec, execFn } from '../utils/execa'
 import { readEnv, writeEnv } from '../utils/env'
 import type { AnswerArr } from '../types'
-import { platform } from 'os'
 import { excludeList } from '../const'
-import { readFileSync } from 'fs'
-import { oraPromise } from 'ora'
 
 const defaultBanner = '欢迎使用 cli-gpt 智能终端应用'
 const gradientBanner = printColorLogs(defaultBanner)
@@ -38,33 +42,47 @@ export async function start(question?: ({} & string) | 'fix') {
 
   // 执行修复功能
   if (question === 'fix') {
-    // 验证是否有PowerShell记录
-    if (isWin && !powerShellHistory) {
-      powerShellHistory = scanDirFile('C:/Users', ['.txt'], excludeList).filter(item => item.includes('ConsoleHost_history'))?.[0]
-
-      if (!powerShellHistory) {
-        printErrorLogs('无法找到终端历史记录文件')
-        process.exit(1)
-      }
-
-      // 写入env
-      writeEnv({
-        powerShellHistory
-      })
-    }
-
-    const historyList = readFileSync(powerShellHistory, 'utf8').split('\n').filter(i => i)
-    const lastHistory = historyList[historyList.length - 2]
-    const transformHistory = lastHistory.replace(/\r/g, '')
     let errorInfo = ''
 
-    await runCmd(transformHistory)
+    if (isWin) {
+      // 验证是否有PowerShell记录
+      if (!powerShellHistory) {
+        powerShellHistory = scanDirFile('C:/Users', ['.txt'], excludeList).filter(item => item.includes('ConsoleHost_history'))?.[0]
 
-    await fetchAnswer(question, [transformHistory, errorInfo])
-    process.exit(1)
+        if (!powerShellHistory) {
+          printErrorLogs('无法找到终端历史记录文件')
+          process.exit(1)
+        }
+
+        // 写入env
+        writeEnv({
+          powerShellHistory,
+        })
+      }
+
+      const historyList = readFileSync(powerShellHistory, 'utf8').split('\n').filter(i => i)
+      const lastHistory = historyList[historyList.length - 2]
+      const transformHistory = lastHistory.replace(/\r/g, '')
+
+      await runCmd(transformHistory)
+
+      await fetchQuestion(question, [transformHistory, errorInfo])
+      process.exit(0)
+    }
+    else {
+      // mac
+      const historyList = shellHistory()
+      const lastHistory = historyList[historyList.length - 2]
+      const transformHistory = lastHistory.replace(/\r/g, '')
+
+      await runCmd(transformHistory)
+
+      await generateAnswer(question, [transformHistory, errorInfo])
+      process.exit(0)
+    }
 
     async function runCmd(cmd: string) {
-      return new Promise(resolve => {
+      return new Promise((resolve) => {
         execFn(cmd, (err: any, stdout: string) => {
           errorInfo = `Error: ${err?.message}\n${stdout || ''}`
           resolve(true)
@@ -123,7 +141,7 @@ export async function start(question?: ({} & string) | 'fix') {
       for (const cmd of cmdList) {
         await oraPromise(exec(cmd), {
           text: `正在运行 ${cmd}...`,
-          successText: `✨ ${cmd} 运行成功！`
+          successText: `✨ ${cmd} 运行成功！`,
         })
       }
     }

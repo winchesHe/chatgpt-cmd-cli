@@ -103,12 +103,21 @@ export async function fetchQuestion(question: string, errorInfo: string[] = []) 
 
   const isError = !!errorInfo.length
   const [cmd, info] = errorInfo
-  const errorPrompt = `运行\`${cmd}\`指令的时候报错了，我要怎么修复它，下面三个反引号圈起来的是错误信息，你可以根据错误信息思考出对应的解决办法。
+  const errorPrompt = `运行\`${cmd}\`指令的时候报错了，我要怎么修复它，下面三个反引号圈起来的是错误信息，你可以根据错误信息思考出对应的解决办法，并且按照之前要求的JSON格式回复。
 
   错误信息：
   \`\`\`
   ${info}
-  \`\`\``
+  \`\`\`
+
+  回答直接输出JSON类型，若有其他可能，也放到一个数组里输出：
+  [
+    {
+      execute: true,
+      desc: '示例的描述',
+      cmd: 'git branch'
+    }
+  ]`
 
   const res = await oraPromise(_cmdRunner.cmdRunner(isError ? errorPrompt : question), {
     text: isError ? `正在分析错误（${cmd}）...` : question,
@@ -116,7 +125,7 @@ export async function fetchQuestion(question: string, errorInfo: string[] = []) 
 
   try {
     const text = res.text
-    const matchReg = /\[.*\]/ms
+    const matchReg = /\[.*?\]/ms
     const matchJson = text.match(matchReg)?.[0]
 
     if (!matchJson) {
